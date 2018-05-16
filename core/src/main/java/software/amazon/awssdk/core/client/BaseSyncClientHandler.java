@@ -45,21 +45,27 @@ public abstract class BaseSyncClientHandler extends BaseClientHandler implements
     public final <InputT extends SdkRequest, OutputT extends SdkResponse, ReturnT> ReturnT execute(
         ClientExecutionParams<InputT, OutputT> executionParams,
         ResponseTransformer<OutputT, ReturnT> responseTransformer) {
+
         ExecutionContext executionContext = createExecutionContext(executionParams.getInput());
-        HttpResponseHandler<OutputT> interceptorCallingResponseHandler =
-            interceptorCalling(executionParams.getResponseHandler(), executionContext);
+
+        HttpResponseHandler<OutputT> decorateResponseHandlers = decorateResponseHandlers(executionParams, executionContext);
+
         HttpResponseHandler<ReturnT> httpResponseHandler =
-            new HttpResponseHandlerAdapter<>(interceptorCallingResponseHandler, responseTransformer);
+            new HttpResponseHandlerAdapter<>(decorateResponseHandlers, responseTransformer);
         return execute(executionParams, executionContext, httpResponseHandler);
     }
 
     @Override
     public final <InputT extends SdkRequest, OutputT extends SdkResponse> OutputT execute(
         ClientExecutionParams<InputT, OutputT> executionParams) {
+
         ExecutionContext executionContext = createExecutionContext(executionParams.getInput());
-        return execute(executionParams, executionContext, interceptorCalling(executionParams.getResponseHandler(),
-                                                                             executionContext));
+
+        HttpResponseHandler<OutputT> decorateResponseHandlers = decorateResponseHandlers(executionParams, executionContext);
+
+        return execute(executionParams, executionContext, decorateResponseHandlers);
     }
+
 
     @Override
     public void close() {
@@ -81,6 +87,17 @@ public abstract class BaseSyncClientHandler extends BaseClientHandler implements
                      .executionContext(executionContext)
                      .errorResponseHandler(errorResponseHandler)
                      .execute(responseHandler);
+    }
+
+    /**
+     * Decorate response handlers by running after unmarshalling Interceptors and adding http response metadata.
+     */
+    private <InputT extends SdkRequest, OutputT extends SdkResponse> HttpResponseHandler<OutputT> decorateResponseHandlers
+        (ClientExecutionParams<InputT, OutputT> executionParams, ExecutionContext executionContext) {
+        HttpResponseHandler<OutputT> interceptorCallingResponseHandler =
+            interceptorCalling(executionParams.getResponseHandler(), executionContext);
+
+        return addHttpResponseMetadataResponseHandler(interceptorCallingResponseHandler);
     }
 
     private <InputT extends SdkRequest, OutputT, ReturnT> ReturnT execute(

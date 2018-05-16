@@ -25,7 +25,7 @@ import software.amazon.awssdk.annotations.SdkPublicApi;
  */
 @Immutable
 @SdkPublicApi
-public class SdkHttpMetadata {
+public final class SdkHttpMetadata {
 
     private final Map<String, String> httpHeaders;
 
@@ -45,9 +45,19 @@ public class SdkHttpMetadata {
     }
 
     /**
+     * Get a specific header from the HTTP response.
+     *
+     * @param headerName Header to retrieve.
+     * @return header value.
+     */
+    public String header(String headerName) {
+        return httpHeaders.get(headerName);
+    }
+
+    /**
      * @return All HTTP headers in response.
      */
-    public Map<String, String> getHttpHeaders() {
+    public Map<String, String> httpHeaders() {
         return httpHeaders;
     }
 
@@ -57,5 +67,4 @@ public class SdkHttpMetadata {
     public int getHttpStatusCode() {
         return httpStatusCode;
     }
-
 }

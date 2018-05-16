@@ -78,6 +78,8 @@ public class GetObjectAsyncIntegrationTest extends S3IntegrationTestBase {
         try {
             GetObjectResponse response = s3Async.getObject(getObjectRequest, path).join();
             assertMd5MatchesEtag(new FileInputStream(path.toFile()), response);
+            response.sdkHttpMetadata().ifPresent(sdkHttpMetadata -> System.out.println(sdkHttpMetadata.httpHeaders()));
+            response.sdkResponseMetadata().ifPresent(r -> System.out.println(r.requestId()));
         } finally {
             path.toFile().delete();
         }

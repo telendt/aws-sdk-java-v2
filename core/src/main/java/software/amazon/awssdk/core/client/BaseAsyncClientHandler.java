@@ -247,7 +247,9 @@ public abstract class BaseAsyncClientHandler extends BaseClientHandler implement
             try {
                 // TODO would be better to pass in AwsExecutionAttributes to the async response handler so we can
                 // provide them to HttpResponseHandler
-                OutputT resp = interceptorCalling(responseHandler, executionContext).handle(httpResponse, null);
+                OutputT resp = addHttpResponseMetadataResponseHandler(interceptorCalling(responseHandler, executionContext))
+                    .handle(httpResponse, null);
+
                 asyncResponseTransformer.responseReceived(resp);
             } catch (Exception e) {
                 throw Throwables.failure(e);

@@ -17,10 +17,12 @@ package software.amazon.awssdk.core.http;
 
 
 import software.amazon.awssdk.core.SdkResponse;
+import software.amazon.awssdk.core.SdkResponseMetadata;
 
 public class EmptySdkResponse extends SdkResponse {
 
     public EmptySdkResponse(Builder builder) {
+        super(builder);
     }
 
     @Override
@@ -38,6 +40,26 @@ public class EmptySdkResponse extends SdkResponse {
     }
 
     private static class BuilderImpl implements Builder {
+
+        @Override
+        public Builder sdkResponseMetadata(SdkResponseMetadata sdkResponseMetadata) {
+            return null;
+        }
+
+        @Override
+        public SdkResponseMetadata sdkResponseMetadata() {
+            return null;
+        }
+
+        @Override
+        public SdkResponse.Builder sdkHttpMetadata(SdkHttpMetadata sdkHttpMetadata) {
+            return null;
+        }
+
+        @Override
+        public SdkHttpMetadata sdkHttpMetadata() {
+            return null;
+        }
 
         @Override
         public EmptySdkResponse build() {

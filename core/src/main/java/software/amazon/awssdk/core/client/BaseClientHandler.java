@@ -29,6 +29,7 @@ import software.amazon.awssdk.core.config.SdkClientConfiguration;
 import software.amazon.awssdk.core.http.ExecutionContext;
 import software.amazon.awssdk.core.http.HttpResponseHandler;
 import software.amazon.awssdk.core.http.SdkHttpFullRequestAdapter;
+import software.amazon.awssdk.core.http.SdkHttpMetadata;
 import software.amazon.awssdk.core.interceptor.ExecutionAttributes;
 import software.amazon.awssdk.core.interceptor.ExecutionInterceptorChain;
 import software.amazon.awssdk.core.interceptor.InterceptorContext;
@@ -118,6 +119,17 @@ public abstract class BaseClientHandler {
         context.interceptorContext(interceptorContext);
 
         return (OutputT) interceptorContext.response();
+    }
+
+    /**
+     * Add SdkHttpMetadata to SdkResponse.
+     */
+    static <OutputT extends SdkResponse> HttpResponseHandler<OutputT> addHttpResponseMetadataResponseHandler(
+        HttpResponseHandler<OutputT> delegate) {
+        return (response, executionAttributes) -> {
+            OutputT sdkResponse = delegate.handle(response, executionAttributes);
+            return (OutputT) sdkResponse.toBuilder().sdkHttpMetadata(SdkHttpMetadata.from(response)).build();
+        };
     }
 
     static <OutputT extends SdkResponse> HttpResponseHandler<OutputT> interceptorCalling(

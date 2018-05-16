@@ -71,6 +71,9 @@ public class GetObjectIntegrationTest extends S3IntegrationTestBase {
     public void toInputStream() throws Exception {
         try (ResponseInputStream<GetObjectResponse> content = s3.getObject(getObjectRequest)) {
             assertMd5MatchesEtag(content, content.response());
+            GetObjectResponse response = content.response();
+            response.sdkHttpMetadata().ifPresent(sdkHttpMetadata -> System.out.println(sdkHttpMetadata.httpHeaders()));
+            response.sdkResponseMetadata().ifPresent(r -> System.out.println(r.requestId()));
         }
     }
 

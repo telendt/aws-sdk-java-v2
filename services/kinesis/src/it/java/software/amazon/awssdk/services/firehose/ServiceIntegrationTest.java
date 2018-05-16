@@ -28,7 +28,9 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
+import software.amazon.awssdk.core.SdkResponseMetadata;
 import software.amazon.awssdk.core.exception.SdkServiceException;
+import software.amazon.awssdk.core.http.SdkHttpMetadata;
 import software.amazon.awssdk.services.firehose.model.CreateDeliveryStreamRequest;
 import software.amazon.awssdk.services.firehose.model.ListDeliveryStreamsRequest;
 import software.amazon.awssdk.services.firehose.model.ListDeliveryStreamsResponse;
@@ -117,6 +119,10 @@ public class ServiceIntegrationTest extends AwsTestBase {
                 .listDeliveryStreams(ListDeliveryStreamsRequest.builder().build());
         assertNotNull(result.deliveryStreamNames());
         assertNotNull(result.hasMoreDeliveryStreams());
+
+        System.out.println(result.sdkResponseMetadata().map(SdkResponseMetadata::requestId));
+
+        System.out.println(result.sdkHttpMetadata().map(SdkHttpMetadata::httpHeaders));
     }
 
     @Test
